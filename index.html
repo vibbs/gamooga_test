@@ -5,10 +5,10 @@
     </head>
     <body>
         <h1>String reversal</h1>
-        <p>Hit enter after completion of sentence</p>
-        <form id="form" id="chat_form">
+        <p>Hit ENTER after completion of sentence</p>
+
             <input id="chat_input" type="text" onfocus="this.value=''" onkeypress="myFunction()">
-        </form>
+
 
         <div id="future"></div>
          <script src="/jquery/dist/jquery.js"></script>
@@ -18,32 +18,32 @@
 
 
     <script>  
-        var client_id = Math.floor(Math.random() * 26) + Date.now();
-        
+        var client_id =null;
+        $(document).ready(function() {
+            client_id = localStorage['client_id'];
+            if (!client_id) {
+                // open popup
+                localStorage['client_id'] = Math.floor(Math.random() * 26) + Date.now();
+            }
+        });
         var socket = io.connect('http://localhost:4200');
         socket.on('connect', function(data) {
            //socket.emit('join', 'Hello World from client');
-           socket.emit('join', client_id);
+           socket.emit('join', localStorage['client_id']);
         });
-        socket.on('broad', function(data) {
+        socket.on(localStorage['client_id'], function(data) {
             $('#future').html('');
             $('#future').append(data+ "<br/>");
-        });
-
-        $('form').submit(function(e){
-            e.preventDefault();
-            var message = $('#chat_input').val();
-            socket.emit('messages', message);
         });
         
         function myFunction() {
             var x = document.getElementById("chat_input").value;
             if(x)
-            socket.emit('messages', x[x.length-1]);
+            socket.emit(localStorage['client_id'], x[x.length-1]);
         }
         $("#chat_input").keyup(function(event) {
             if (event.keyCode === 13) {
-                socket.emit('messages', "terminate-x-x-x");
+                socket.emit(localStorage['client_id'], "terminate-x-x-x");
             }
         });
        </script>  
